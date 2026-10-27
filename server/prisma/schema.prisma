@@ -1,0 +1,115 @@
+// Схема на базата данни за BEL-APP (issue #10)
+// ER диаграма: docs/ER.md
+
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "client" // работи през @prisma/adapter-pg, без отделен query engine
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum TopicCategory {
+  LANGUAGE   // Български език
+  LITERATURE // Литература
+}
+
+enum TestMode {
+  TOPIC // тест по една тема
+  EXAM  // пробна матура от всички теми, с таймер
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  passwordHash String
+  role         Role          @default(STUDENT)
+  createdAt    DateTime      @default(now())
+  attempts     TestAttempt[]
+
+  @@map("users")
+}
+
+model Topic {
+  id          Int           @id @default(autoincrement())
+  name        String
+  slug        String        @unique
+  category    TopicCategory
+  description String?
+  questions   Question[]
+  attempts    TestAttempt[]
+
+  @@map("topics")
+}
+
+model Question {
+  id             Int             @id @default(autoincrement())
+  topicId        Int
+  text           String
+  explanation    String
+  difficulty     Int             @default(1) // 1 = лесен, 2 = среден, 3 = труден
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  topic          Topic           @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  answers        Answer[]
+  attemptAnswers AttemptAnswer[]
+
+  @@index([topicId])
+  @@map("questions")
+}
+
+model Answer {
+  id             Int             @id @default(autoincrement())
+  questionId     Int
+  text           String
+  isCorrect      Boolean         @default(false)
+  question       Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  attemptAnswers AttemptAnswer[]
+
+  @@index([questionId])
+  @@map("answers")
+}
+
+model TestAttempt {
+  id          Int             @id @default(autoincrement())
+  userId      Int? // става задължително, когато е готова автентикацията (#11)
+  topicId     Int? // само при mode = TOPIC
+  mode        TestMode
+  startedAt   DateTime        @default(now())
+  expiresAt   DateTime? // само при mode = EXAM
+  submittedAt DateTime?
+  score       Int?
+  total       Int
+  user        User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic       Topic?          @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  answers     AttemptAnswer[]
+
+  @@index([userId])
+  @@map("test_attempts")
+}
+
+// Един ред за всеки въпрос в опита. Създава се при старт (answerId = null)
+// и се попълва при предаване.
+model AttemptAnswer {
+  id         Int         @id @default(autoincrement())
+  attemptId  Int
+  questionId Int
+  answerId   Int?
+  isCorrect  Boolean?
+  position   Int // реда на въпроса в теста
+  attempt    TestAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question   Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer     Answer?     @relation(fields: [answerId], references: [id], onDelete: SetNull)
+
+  @@unique([attemptId, questionId])
+  @@map("attempt_answers")
+}

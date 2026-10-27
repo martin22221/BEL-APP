@@ -1,0 +1,18 @@
+# Локална база PostgreSQL за разработка.
+# Пускане: docker compose up -d     Спиране: docker compose down
+services:
+  db:
+    image: postgres:16
+    container_name: bel-app-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bel
+      POSTGRES_PASSWORD: bel
+      POSTGRES_DB: bel_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - bel-app-data:/var/lib/postgresql/data
+
+volumes:
+  bel-app-data:

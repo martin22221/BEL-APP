@@ -1,0 +1,8 @@
+[
+  { "slug": "pravopis", "name": "Правопис", "category": "LANGUAGE", "description": "Правописни правила, членуване, слято и разделно писане" },
+  { "slug": "punktuatsia", "name": "Пунктуация", "category": "LANGUAGE", "description": "Запетаи в простото и сложното изречение, обръщения, вметнати думи" },
+  { "slug": "gramatika", "name": "Граматика", "category": "LANGUAGE", "description": "Части на речта, глаголни времена и наклонения, форми на думите" },
+  { "slug": "leksika", "name": "Лексика", "category": "LANGUAGE", "description": "Синоними, антоними, пароними, плеоназми" },
+  { "slug": "avtori-i-proizvedenia", "name": "Автори и произведения", "category": "LITERATURE", "description": "Произведенията от учебната програма и техните автори" },
+  { "slug": "literaturni-termini", "name": "Литературни термини", "category": "LITERATURE", "description": "Изразни средства и литературни понятия" }
+]

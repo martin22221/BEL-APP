@@ -1,0 +1,19 @@
+/* Временен базов стил. Tailwind се добавя в issue #1. */
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: #1f2937;
+  background: #f9fafb;
+}
+nav {
+  display: flex;
+  gap: 16px;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+}
